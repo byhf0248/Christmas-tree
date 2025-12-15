@@ -1,5 +1,4 @@
 gsap.registerPlugin(MorphSVGPlugin, DrawSVGPlugin, MotionPathPlugin, Physics2DPlugin, EasePack);
-
 function snow() {
             //  1、定义一片雪花模板
             var flake = document.createElement('div');
@@ -83,7 +82,13 @@ select = function(s) {
   sparkle = select('.sparkle'),
   tree = select('#tree'),
   showParticle = true,
-  particleColorArray = ['#E8F6F8', '#ACE8F8', '#F6FBFE','#A2CBDC','#B74551', '#5DBA72', '#910B28', '#910B28', '#446D39'],
+  // 替换原有的粒子颜色数组
+particleColorArray = [
+    '#E8F6F8', '#ACE8F8', '#F6FBFE', '#A2CBDC', 
+    '#B74551', '#5DBA72', '#910B28', '#910B28', 
+    '#446D39', '#FFD700', '#FF0000', '#00FF00', 
+    '#FFFF00', '#FF1493', '#00BFFF', '#FF8C00'
+];
   particleTypeArray = ['#star','#circ','#cross','#heart'],
  // particleTypeArray = ['#star'],
   particlePool = [],
@@ -139,72 +144,73 @@ function flicker(p){
   })
 }
 
+// 修改粒子生成函数，增加更多装饰性元素
 function createParticles() {
-  
-  //var step = numParticles/starPath.length;
-  //console.log(starPath.length)
-  var i = numParticles, p, particleTl, step = numParticles/treePath.length, pos;
-  while (--i > -1) {
-    
-    p = select(particleTypeArray[i%particleTypeArray.length]).cloneNode(true);
-    mainSVG.appendChild(p);
-    p.setAttribute('fill', particleColorArray[i % particleColorArray.length]);
-    p.setAttribute('class', "particle");   
-    particlePool.push(p);
-    //hide them initially
-    gsap.set(p, {
-                 x:-100, 
-                 y:-100,
-   transformOrigin:'50% 50%'
-                 })
-    
-    
-
-  }
-
+    var i = numParticles, p, particleTl, step = numParticles/treePath.length, pos;
+    while (--i > -1) {
+        // 使用不同的粒子类型
+        var particleType = particleTypeArray[i%particleTypeArray.length];
+        p = select(particleType).cloneNode(true);
+        
+        // 设置随机颜色
+        var colorIndex = i % particleColorArray.length;
+        p.setAttribute('fill', particleColorArray[colorIndex]);
+        
+        // 添加特殊效果
+        if (particleType === '#star') {
+            p.style.opacity = '0.8';
+            p.style.filter = 'drop-shadow(0 0 5px rgba(255,255,255,0.8))';
+        }
+        
+        mainSVG.appendChild(p);
+        p.setAttribute('class', "particle");   
+        particlePool.push(p);
+        
+        // 隐藏初始状态
+        gsap.set(p, {
+            x:-100, 
+            y:-100,
+            transformOrigin:'50% 50%'
+        });
+    }
 }
 
 var getScale = gsap.utils.random(0.5, 3, 0.001, true);  //  圣诞树开始绘画时小光点动画的特效（参数：最小值，最大值，延迟）
 
+// 修改粒子播放函数，增加更多装饰效果
 function playParticle(p){
-  if(!showParticle){return};
-  var p = particlePool[particleCount]
- gsap.set(p, {
-	 x: gsap.getProperty('.pContainer', 'x'),
-	 y: gsap.getProperty('.pContainer', 'y'),
-	 scale:getScale()
-    }
-    );
-var tl = gsap.timeline();
-  tl.to(p, {
-		duration: gsap.utils.random(0.61,6),
-      physics2D: {
-        velocity: gsap.utils.random(-23, 23),
-        angle:gsap.utils.random(-180, 180),
-        gravity:gsap.utils.random(-6, 50)
-      },
-      scale:0,
-      rotation:gsap.utils.random(-123,360),
-      ease: 'power1',
-      onStart:flicker,
-      onStartParams:[p],
-      //repeat:-1,
-      onRepeat: (p) => {
-        gsap.set(p, {         
-            scale:getScale()
-        })
-      },
-      onRepeatParams: [p]
-
+    if(!showParticle){return};
+    var p = particlePool[particleCount];
+    
+    gsap.set(p, {
+        x: gsap.getProperty('.pContainer', 'x'),
+        y: gsap.getProperty('.pContainer', 'y'),
+        scale:getScale()
     });
-  
-
-  //
-  //particlePool[particleCount].play();
-  particleCount++;
-  //mainTl.add(tl, i / 1.3)
-  particleCount = (particleCount >=numParticles) ? 0 : particleCount
-  
+    
+    var tl = gsap.timeline();
+    tl.to(p, {
+        duration: gsap.utils.random(0.61,6),
+        physics2D: {
+            velocity: gsap.utils.random(-23, 23),
+            angle:gsap.utils.random(-180, 180),
+            gravity:gsap.utils.random(-6, 50)
+        },
+        scale:1.8,
+        rotation:gsap.utils.random(-123,360),
+        ease: 'power1',
+        onStart:flicker,
+        onStartParams:[p],
+        onRepeat: function() {
+            gsap.set(p, {         
+                scale:getScale()
+            })
+        },
+        onRepeatParams: [p]
+    });
+    
+    particleCount++;
+    particleCount = (particleCount >=numParticles) ? 0 : particleCount;
 }
 // 圣诞树开始绘画时小光点动画
 function drawStar(){
@@ -246,9 +252,9 @@ function drawStar(){
   
 }
 
-
 createParticles();
 drawStar();
+
 //ScrubGSAPTimeline(mainTl)
 
 mainTl
@@ -263,6 +269,23 @@ mainTl
     duration: gsap.utils.wrap([6, 1,2]),
   ease:'linear'
 })
+// 添加颜色渐变效果，让树木在绘制完成后呈现更丰富的色彩
+.to('.tree, .treeBottom, .treePot', {
+    duration: 2,
+    fill: '#228B22', // 深绿色
+    ease: 'power2.inOut'
+}, '-=2')
+// 可以添加多阶段颜色变化
+.to('.tree, .treeBottom, .treePot', {
+    duration: 1,
+    fill: '#32CD32', // 草绿色
+    ease: 'power1.inOut'
+})
+.to('.tree, .treeBottom, .treePot', {
+    duration: 1,
+    fill: '#2E8B57', // 海洋绿
+    ease: 'power1.inOut'
+})
 //  圣诞树头上的星星动画
 .from('.treeStar', {
 	duration: 3,
@@ -270,6 +293,8 @@ mainTl
   scaleY:0,
   scaleX:0.15,
   transformOrigin:'50% 50%',
+  rotation: 360,
+  ease: 'linear',
   ease: 'elastic(1,0.5)'
 },'-=4')
 // 当绘画圣诞树的小光点绘制完时，让小光点消失
@@ -293,11 +318,33 @@ gsap.globalTimeline.timeScale(1.5);    //  圣诞树开始绘画时小光点动�
 
 setTimeout( function(){
   var element = document.getElementById("header");
-  element.innerHTML = "特别子, 圣诞快乐!";
- 
+  element.innerHTML = "✨ 璐璐宝贝，圣诞快乐呀！🎄<br>愿你天天开心，像小星星一样闪闪发光～";
+  // element.style.marginLeft = "-300px"; // 左偏移20像素
    
-}, 7 * 1000 );//延迟5000毫米
-
+}, 7000 );//延迟5000毫米
+// 圣诞树灯光闪烁效果
+setTimeout(function() {
+    // 创建闪烁动画
+    gsap.to('.treeStarOutline', {
+        duration: 2,
+        fill: '#ff9ec7',
+        repeat: -1,
+        yoyo: true,
+        ease: 'power1.inOut',
+        onStart: function() {
+            // 可以在这里添加更多的动态效果
+        }
+    });
+    
+    // 星星闪烁效果
+    // gsap.to('.treeStar', {
+    //     duration: 1,
+    //     fill: '#0155e7ff',
+    //     repeat: -1,
+    //     yoyo: true,
+    //     ease: 'power1.inOut'
+    // });
+}, 3500); // 在绘制完成后开始闪烁效果
 // setTimeout( function(){
 
 //    var element = document.getElementById("p2");
@@ -307,7 +354,4 @@ setTimeout( function(){
      
    
 // }, 10 * 1000 );//延迟5000毫米
-
-
-
 
