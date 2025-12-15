@@ -1,3 +1,5 @@
+gsap.registerPlugin(MorphSVGPlugin, DrawSVGPlugin, MotionPathPlugin, Physics2DPlugin, EasePack);
+
 function snow() {
             //  1、定义一片雪花模板
             var flake = document.createElement('div');
@@ -305,6 +307,7 @@ setTimeout( function(){
      
    
 // }, 10 * 1000 );//延迟5000毫米
+
 
 
 
