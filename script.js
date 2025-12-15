@@ -49,19 +49,19 @@ function snow() {
 
                 //设置第二个定时器，一次性定时器，
                 //当第一个定时器生成雪花，并在页面上渲染出来后，修改雪花的样式，让雪花动起来；
-                // setTimeout(function() {
-                //     //第二次修改样式
-                //     cloneFlake.style.cssText += `
-                //                 left: ${endLeft}px;
-                //                 top:${documentHieght}px;
-                //                 opacity:${endOpacity};
-                //             `;
+                setTimeout(function() {
+                    //第二次修改样式
+                    cloneFlake.style.cssText += `
+                                left: ${endLeft}px;
+                                top:${documentHieght}px;
+                                opacity:${endOpacity};
+                            `;
 
-                //     //4、设置第三个定时器，当雪花落下后，删除雪花。
-                //     setTimeout(function() {
-                //         cloneFlake.remove();
-                //     }, durationTime);
-                // }, 0);
+                    //4、设置第三个定时器，当雪花落下后，删除雪花。
+                    setTimeout(function() {
+                        cloneFlake.remove();
+                    }, durationTime);
+                }, 0);
 
             }, millisec);
         }
@@ -289,12 +289,12 @@ mainTl
 mainTl.add(starTl, 0)
 gsap.globalTimeline.timeScale(1.5);    //  圣诞树开始绘画时小光点动画的绘画速率，越大越快
 
-// setTimeout( function(){
-//   var element = document.getElementById("header");
-//   element.innerHTML = "特别子, 圣诞快乐!";
+setTimeout( function(){
+  var element = document.getElementById("header");
+  element.innerHTML = "特别子, 圣诞快乐!";
  
    
-// }, 7 * 1000 );//延迟5000毫米
+}, 7 * 1000 );//延迟5000毫米
 
 // setTimeout( function(){
 
@@ -305,5 +305,6 @@ gsap.globalTimeline.timeScale(1.5);    //  圣诞树开始绘画时小光点动�
      
    
 // }, 10 * 1000 );//延迟5000毫米
+
 
 
